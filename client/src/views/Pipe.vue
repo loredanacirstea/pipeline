@@ -138,12 +138,15 @@
         <swiper-slide class="swiper-margin no-swipe">
           <v-container class="thincontainer fit">
             <PipeApp
+                :web3="web3"
                 :chainid="chain"
                 :contractSource="contractSource"
                 :deploymentInfo="deploymentInfo"
                 :jsSource="jsSource"
                 :graphSource="graphSource"
+                :graphFullSource="graphFullSource"
                 :graphsAbi="graphsAbi"
+                :graphStepsAbi="graphStepsAbi"
                 v-on:load-remix="pipedLoadToRemix"
                 v-on:set-graphs="setCanvasGraph"
                 v-on:saved="onSavedGraph"
@@ -176,6 +179,8 @@
 </template>
 
 <script>
+/* eslint-disable */
+
 import Vue from 'vue';
 import PipeGraphs from '@pipeos/pipecanvas';
 import {pfunctionColorClass} from '@pipeos/pipecanvas/src/utils';
@@ -261,7 +266,9 @@ export default {
         deploymentInfo: [],
         jsSource: '',
         graphSource: '',
+        graphFullSource: [],
         graphsAbi: null,
+        graphStepsAbi: null,
         graphInstance: null,
         pipedContracts: {},
         ethpmDialog: false,
@@ -391,8 +398,10 @@ export default {
                     let deployment_info;
                     this.contractSource = this.graphInstance.getSource('solidity');
                     this.graphSource = JSON.stringify(this.graphInstance.getSource('graphs'));
+                    this.graphFullSource = this.graphInstance.getSource('fullgraph');
                     this.jsSource = this.graphInstance.getSource('javascript');
                     this.graphsAbi = this.graphInstance.getSource('abi');
+
                     deployment_info = this.graphInstance.getSource('constructor');
                     this.deploymentInfo = [{
                         funcName: 'proxy',
@@ -418,6 +427,26 @@ export default {
                             return contract_address;
                         })
                     );
+
+                    const graphStepsAbi = {};
+                    Object.keys(deployment_info).forEach(funcName => {
+                        let function_id = deployment_info[funcName]
+                        this.selectedFunctions.forEach(pipedFunction => {
+                            let functionObj = pipedFunction.find(func => func._id == function_id);
+                            if (functionObj) {
+                                console.log('functionObj', functionObj);
+                                const deployment = functionObj.pclass.deployment.pclassi;
+                                graphStepsAbi[function_id] = {
+                                    name: funcName,
+                                    abi: functionObj.pfunction.gapi,
+                                    signature: functionObj.pfunction.signature,
+                                    deployment: deployment.openapiid ? `http://${deployment.host}${deployment.basePath}` : deployment.address,
+                                    contractName: functionObj.pclass.name,
+                                }
+                            }
+                        });
+                    });
+                    this.graphStepsAbi = graphStepsAbi;
                 },
                 onGraphFunctionRemove: (grIndex, nodes) => {
                     console.log('onGraphFunctionRemove', grIndex, nodes);

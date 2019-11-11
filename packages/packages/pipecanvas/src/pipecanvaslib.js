@@ -386,6 +386,7 @@ function proc2(gr) {
         }
         if (x.ops.type == "visual") {
             langs["graphs"] = pipe2.graphs
+            langs["fullgraph"] = pipe2.cgraphs
         }
 
     },visitors)

@@ -113,7 +113,7 @@ export default {
             }
             if (provider === 'vm') {
                 this.chain = 'JavaScriptVM';
-                this.deployPipeProxy();
+                this.deployPipeContracts();
             } else if (provider === 'injected') {
                 this.web3 = await getWeb3();
                 this.chain = this.web3.version.network;
@@ -169,7 +169,7 @@ export default {
             }
             return [];
         },
-        deployPipeProxy() {
+        deployPipeContracts() {
             if (this.chain === 'JavaScriptVM') {
                 let count =  0;
                 let iid = setInterval(() => {
@@ -180,6 +180,12 @@ export default {
                     deployOnJVM(Pipeos.contracts.PipeProxy.compiled.bytecode, '300000', (result) => {
                         if (result && result.createdAddress) {
                             Pipeos.contracts.PipeProxy.addresses['JavaScriptVM'] = result.createdAddress;
+                            clearInterval(iid);
+                        }
+                    });
+                    deployOnJVM(Pipeos.contracts.GraphInterpreter.compiled.bytecode, '300000', (result) => {
+                        if (result && result.createdAddress) {
+                            Pipeos.contracts.GraphInterpreter.addresses['JavaScriptVM'] = result.createdAddress;
                             clearInterval(iid);
                         }
                     });

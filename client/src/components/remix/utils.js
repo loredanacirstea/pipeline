@@ -21,10 +21,10 @@ export async function deployOnJVM(bytecode, gasLimit, callback) {
             transaction,
         );
         if (!receipt || !receipt.createdAddress) {
-            throw new Error('PipeProxy contract not created');
+            throw new Error('Contract not created');
         }
         if (receipt.error) {
-            throw new Error(`PipeProxy contract not created: ${receipt.error}`);
+            throw new Error(`Contract not created: ${receipt.error}`);
         }
     } catch (e) {
         throw e;

@@ -3,6 +3,7 @@
       <v-flex xs12 class='fit'>
         <v-tabs fixed-tab left class="fullheight">
             <v-tab ripple key="solidity">Sol</v-tab>
+            <v-tab ripple key="interpreter">I</v-tab>
             <v-tab ripple key="deployment">Deploy</v-tab>
             <v-tab ripple key="js">Js</v-tab>
             <v-tab ripple key="graph">Graph</v-tab>
@@ -36,6 +37,48 @@
                     </v-tooltip>
                 </v-toolbar>
                 <textarea ref='contractSource' class='source-txtar'>{{contractSourceLast}}</textarea>
+            </v-tab-item>
+            <v-tab-item
+                key="interpreter"
+                class="fullheight swiper-margin"
+            >
+                <v-toolbar flat color="#fff" height="47">
+                    <v-btn
+                        small flat fab
+                        v-on:click="clipboardCopy('interpreterJson')"
+                    >
+                        <v-icon>fa-copy</v-icon>
+                    </v-btn>
+                    <div class="text-center">
+                      <v-dialog
+                        v-model="dialogInterpreter"
+                        width="70%"
+                      >
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                              small flat fab
+                              slot="activator"
+                              v-on="on"
+                          >
+                              <v-icon>fa-play-circle</v-icon>
+                          </v-btn>
+                        </template>
+                        <v-card v-if="dialogInterpreter">
+                          <v-card-text>
+                            <v-container>
+                              <PipeInterpreter
+                                  :graphsAbi="graphsAbi"
+                                  :interpreterJson="interpreterJson"
+                                  :interpreterData="interpreterData"
+                                  :interpreterContract="interpreterContract"
+                              />
+                            </v-container>
+                          </v-card-text>
+                        </v-card>
+                      </v-dialog>
+                    </div>
+                </v-toolbar>
+                <textarea ref='interpreterJson' class='source-txtar'>{{interpreterJson}}</textarea>
             </v-tab-item>
             <v-tab-item
                 key="deployment"
@@ -187,13 +230,17 @@
 </template>
 
 <script>
+/* eslint-disable */
+
 import Vue from 'vue';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import VueQrcode from '@chenfengyuan/vue-qrcode';
 import {AbiFunction} from 'vue-ethabi';
 import PipeGraph from './PipeGraph';
+import PipeInterpreter from './PipeInterpreter';
 import Pipeos from '../../namespace/namespace';
+import {buildinterpreterArgs} from './utils';
 
 Vue.component(VueQrcode.name, VueQrcode);
 
@@ -203,26 +250,28 @@ export default {
     components: {
         AbiFunction,
         PipeGraph,
+        PipeInterpreter,
         VueQrcode,
     },
-    props: ['chainid', 'contractSource', 'graphSource', 'jsSource', 'deploymentInfo', 'graphsAbi'],
+    props: ['web3', 'chainid', 'contractSource', 'graphSource', 'graphFullSource', 'jsSource', 'deploymentInfo', 'graphsAbi', 'graphStepsAbi'],
     data: () => ({
         contractSourceLast: '',
         graphSourceLast: '',
         jsSourceLast: '',
         deploymentInfoLast: '',
         deploymentInfoMap: '',
+        interpreterJson: [],
+        interpreterData: [],
         dialog: false,
         dialogGraph: false,
+        dialogInterpreter: false,
         pipegraphId: null,
         pipegraphData: null,
         qrcodeValue: null,
+        interpreterContract: null,
     }),
     created: function() {
         this.setInitialData();
-    },
-    mounted: function() {
-        this.setDeploymentInfo();
     },
     watch: {
         contractSource: function() {
@@ -237,6 +286,9 @@ export default {
         deploymentInfo: function() {
             this.setDeploymentInfo();
         },
+        graphStepsAbi() {
+          this.setInterpreter();
+        },
         dialog: function() {
             let elements = document.getElementsByClassName('abiFunctionOutput');
             for (let i = 0; i < elements.length; i++) {
@@ -248,7 +300,10 @@ export default {
         },
         pipegraphId() {
           this.qrcodeValue = `${Pipeos.pipem}${this.pipegraphId}`;
-        }
+        },
+        chainid() {
+          this.setInterpreterContract();
+        },
     },
     methods: {
         setDeploymentInfo: function() {
@@ -262,6 +317,7 @@ export default {
             this.contractSourceLast = this.contractSource;
             this.graphSourceLast = this.graphSource;
             this.jsSourceLast = this.jsSource;
+            this.setDeploymentInfo();
             let self = this;
 
             this.PipedScriptCallback = window.PipedScriptCallback = (funcName, returnValues) => {
@@ -272,6 +328,22 @@ export default {
                     element.insertAdjacentHTML('beforeend', `<p>${name}: ${this.prepareOutput(returnValues[name])}</p>`);
                 });
             }
+            this.setInterpreter();
+            this.setInterpreterContract();
+        },
+        setInterpreter() {
+          const interpreterData = buildinterpreterArgs(this.graphFullSource, this.graphStepsAbi, this.graphsAbi);
+          this.interpreterJson = interpreterData.allArgs;
+          this.interpreterData = interpreterData;
+        },
+        setInterpreterContract() {
+          if (!this.web3) return;
+          const provider = new ethers.providers.Web3Provider(this.web3.currentProvider);
+          const signer = provider.getSigner();
+          const address = Pipeos.contracts.GraphInterpreter.addresses[this.chainid];
+          const abi = Pipeos.contracts.GraphInterpreter.compiled.abi;
+          signer.getAddress().then((addr) => console.log('signer addr', addr));
+          this.interpreterContract = new ethers.Contract(address, abi, signer);
         },
         prepareOutput: function(value) {
             if (typeof value === 'object') {
