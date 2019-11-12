@@ -3,11 +3,13 @@ import {PClass} from './pclass.model';
 import {Graph} from './graph.model';
 import {AbiFunction} from '../interfaces/gapi';
 import {Natspec} from '../interfaces/natspec';
+import {Categories} from './categories.model';
+import {PFunctionSources} from './sources.model';
 
 @model()
 export class AbstractFunction extends Model {
     @property({
-      type: 'string',
+      type: 'object',
       required: true,
     })
     gapi: AbiFunction;
@@ -22,7 +24,17 @@ export class AbstractFunction extends Model {
       type: 'string',
       required: true,
     })
-    source: string;
+    source?: string;
+
+    @property({
+      type: 'object',
+    })
+    sources: PFunctionSources;
+
+    @property({
+      type: 'object',
+    })
+    graph: object;
 
     @property({
       type: 'string',
@@ -77,6 +89,11 @@ export class PFunction extends Entity {
     itemType: 'string',
   })
   tags?: string[];
+
+  @property({
+    type: 'object',
+  })
+  categories?: Categories;
 
   @property({
     type: 'date',

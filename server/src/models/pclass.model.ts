@@ -5,6 +5,8 @@ import {Natspec} from '../interfaces/natspec';
 import {DStorage} from './storage.model';
 import {Bytecode} from './bytecode.model';
 import {Compiler} from './compiler.model';
+import {Categories} from './categories.model';
+import {PClassSources} from './sources.model';
 
 @model()
 export class AbstractClass extends Model {
@@ -38,7 +40,12 @@ export class AbstractClass extends Model {
       type: 'array',
       itemType: 'object',
     })
-    sources: Source[];
+    sources?: Source[];
+
+    // @property({
+    //   type: 'object',
+    // })
+    // sources: PClassSources;
 
     @property({
       type: 'string',
@@ -196,7 +203,7 @@ export class PClass extends Entity {
     type: 'array',
     itemType: 'string',
   })
-  tags: string[];
+  tags?: string[];
 
   // TODO remove?
   @property({
@@ -205,10 +212,15 @@ export class PClass extends Entity {
   project?: string;
 
   @property({
+    type: 'object',
+  })
+  categories?: Categories;
+
+  @property({
     type: 'array',
     itemType: 'string',
   })
-  chainids: string[];
+  chainids?: string[];
 
   @property({
     type: 'date',

@@ -110,7 +110,7 @@ export class PackageController {
     );
     for (let i = 0; i < ppackage.package.contracts.length; i++) {
         let pclassid = ppackage.package.contracts[i];
-        let tags = (await pclassController.findById(pclassid)).tags;
+        let tags = (await pclassController.findById(pclassid)).tags || [];
         await pclassController.updateById(
             pclassid,
             {tags: tags.concat(['ethpm', ppackage.package.package_name])},
