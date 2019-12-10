@@ -15,7 +15,7 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import {PFunction} from '../models';
+import {PFunction, PFunctionSources} from '../models/pfunction.model';
 import {PFunctionRepository} from '../repositories';
 
 export class PFunctionController {
@@ -34,6 +34,36 @@ export class PFunctionController {
   })
   async create(@requestBody() pfunction: PFunction): Promise<PFunction> {
     return await this.pfunctionRepository.create(pfunction);
+  }
+
+  @get('/pfunction/migrate', {
+    responses: {
+      '200': {
+        description: 'Project model instance',
+      },
+    },
+  })
+  async migrateFunctions(): Promise<void> {
+    const pfuncFilter: any = JSON.parse(JSON.stringify({
+      where: {'pfunction.source': {"neq": null}}
+    }));
+    let pfuncs = await this.pfunctionRepository.find(pfuncFilter);
+    for (let i = 0; i < pfuncs.length; i++) {
+      const pfunc = pfuncs[i];
+      const sources: PFunctionSources = {};
+
+      if (pfunc.tags && pfunc.tags instanceof Array && pfunc.tags.length > 0) {
+        sources[pfunc.tags[0]] = pfunc.pfunction.source;
+      } else {
+        sources.unknown = pfunc.pfunction.source;
+      }
+
+      pfunc.pfunction.sources = sources;
+      delete pfunc.pfunction.source;
+
+      await this.pfunctionRepository.updateById(pfunc._id, pfunc);
+    };
+    return;
   }
 
   @get('/pfunction/count', {
