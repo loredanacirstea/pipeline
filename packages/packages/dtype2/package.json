@@ -31,5 +31,9 @@
   ],
   "author": "",
   "license": "GPL-3.0",
-  "dependencies": {}
+  "dependencies": {
+    "bn.js": "^5.1.1",
+    "sanctuary": "^2.0.1",
+    "sanctuary-def": "^0.20.1"
+  }
 }
