@@ -32,6 +32,7 @@
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
+    "@pipeos/dtype2": "0.0.1",
     "guify": "^0.12.0"
   }
 }
