@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
-  "browser": "./dist/pipecanvas.min.js",
+  "browser": "./dist/dtype2.min.js",
   "scripts": {
     "build": "webpack --mode production",
     "test": "jest",
