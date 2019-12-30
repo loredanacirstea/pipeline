@@ -36,13 +36,10 @@ dT.t.apply = function(typed, fnName, folder, options) {
     }
     Object.keys(type).forEach((i, nndx) => {
       const onChangeSub = typedSub => {
-        console.log('onChangeSub tuple', nndx, i, typedSub);
         if (options.onChange) {
-          console.log('---', JSON.stringify(typed.type), JSON.stringify(type));
           typed.value[nndx] = typedSub.value;
           const typecpy = JSON.parse(JSON.stringify(typed.type));
           typecpy[i] = typedSub.type;
-          console.log('onChangeSub tuple typed', typecpy, JSON.stringify(typecpy), typed, typed.type, type);
           options.onChange(Object.assign({}, typed, {type: typecpy}));
         }
       }
@@ -64,34 +61,59 @@ dT.t.apply = function(typed, fnName, folder, options) {
   console.log(arrT)
   if (arrT) {
     ans = []
+
+    const addInner = (ind, innerElem) => {
+      innerElem = innerElem ? innerElem.value : JSON.parse(JSON.stringify(typed.value[0]));
+      typed.value.splice(ind, 0, innerElem);
+      options.onChange(typed);
+      options.onReinitialize();
+    }
+
     if (dT.controls.array[fnName]) {
-      folder = dT.controls.array[fnName](typed, folder, options)
+      console.log('array fnName', fnName, folder);
+
+      const onChangeSub = (typedSub, index) => {
+        if (options.onChange) {
+          if (!typedSub) {
+            options.onChange(null);
+          } else {
+            options.onChange(typedSub, index);
+          }
+        }
+      }
+      let optionscpy = Object.assign({}, options, {onChange: onChangeSub});
+
+      if (!optionscpy.arrOptions) {
+        optionscpy.arrOptions = {
+          addInner,
+          add: false,
+          remove: false,
+          index: null,
+        }
+      }
+      optionscpy.arrOptions.addInner = addInner;
+
+      folder = dT.controls.array[fnName](typed, folder, optionscpy)
     }
 
     value.forEach((val, i) => {
-      const onChangeSub = (typedSub) => {
-        if (options.onChange) {
-          if (!typedSub) {
-            typed.value.splice(i, 1);
-            options.onChange(typed);
-          } else {
-            typed.value[i] = typedSub.value;
-            options.onChange(typed);
-          }
+
+      const onChangeSub = (typedSub, index) => {
+        if (!typedSub) {
+          typed.value.splice(i, 1);
+          if (options.onChange) options.onChange(typed);
+        } else if (!index && index !== 0) {
+          typed.value[i] = typedSub.value;
+          if (options.onChange) options.onChange(typed);
+        } else {
+          addInner(index, typedSub);
         }
       }
       const optionscpy = Object.assign({}, options, {onChange: onChangeSub});
 
-      const addArrayElem = (ind) => {
-        // const ind = i+1;
-        typed.value.splice(ind, 0, null);
-        options.onChange(typed);
-        options.onReinitialize();
-        // dT.t.apply({value:value[ind], type:arrT, name: typed.name+ind+ind}, fnName, folder, optionscpy);
-      }
       optionscpy.arrOptions = {
-        add: addArrayElem,
-        remove: () => {},
+        add: true,
+        remove: true,
         index: i,
       }
 
@@ -106,7 +128,6 @@ dT.t.apply = function(typed, fnName, folder, options) {
   let compT = dT.t.getComposite(typed.type)
   if (compT) {
     const onChangeSub = (typedSub) => {
-      console.log('onChangeSub composite', typedSub);
       if (options.onChange) {
         options.onChange(typedSub);
       }
@@ -116,10 +137,9 @@ dT.t.apply = function(typed, fnName, folder, options) {
     return dT.t.apply({value:value, type: compT, name: typed.name}, fnName, folder, optionscpy)
   }
 
-  const onChangeSub = (typedSub) => {
-    console.log('onChangeSub simple', typedSub);
+  const onChangeSub = (typedSub, index) => {
     if (options.onChange) {
-      options.onChange(typedSub);
+      options.onChange(typedSub, index);
     }
   }
   const optionscpy = Object.assign({}, options, {onChange: onChangeSub});

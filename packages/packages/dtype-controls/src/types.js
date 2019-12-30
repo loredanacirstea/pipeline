@@ -9,9 +9,39 @@ function createBtn(text, onclick) {
   return btn;
 }
 
-dT.controls.bn.showControl = function(typed, folder, {onChange, args}) {
+function guiRegister(typed, gui, guiOptions, options = {}, getContainer) {
+  const component = gui.Register(guiOptions);
+  const {arrOptions, onChange} = options;
+
+  if (arrOptions) {
+    const container = getContainer ? getContainer(component) : component.container.children[0];
+
+    if (arrOptions.remove) {
+      const removeBtn = createBtn('-', () => {
+        console.log('remove');
+        component.Remove();
+        if (onChange) onChange(null);
+      });
+      container.appendChild(removeBtn);
+    }
+    if (arrOptions.add) {
+      const addBtn = createBtn('+', () => {
+        console.log('add', typed);
+        // arrOptions.add(arrOptions.index + 1);
+        const newElem = JSON.parse(JSON.stringify(typed));
+        // newArrayElem.value = newArrayElem.value;
+        if (onChange) onChange(newElem, arrOptions.index + 1);
+      });
+      container.appendChild(addBtn);
+    }
+  }
+  return component;
+}
+
+dT.controls.bn.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  const component = gui.Register({
+  const guiOptions = {
     type: 'range', label: typed.name+":"+typed.type,
     min: dT.controls[typed.type].min().toNumber(),
     max: dT.controls[typed.type].max().toNumber(), step: 1 ,
@@ -21,17 +51,21 @@ dT.controls.bn.showControl = function(typed, folder, {onChange, args}) {
       typed.value  = new dT.BN(data)
       if (onChange) onChange(typed);
    }
-  })
+  }
+
+  const component = guiRegister(typed, gui, guiOptions, options);
   console.log('component dT.controls["bn"]', component);
+
   return typed
 }
 
-dT.controls.bbn.showControl = function(typed, folder, {onChange, args}) {
+dT.controls.bbn.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  const component = gui.Register({
-      type: 'text', label: typed.name+":"+typed.type,
-      folder: folder,
-      initial: "0x"+typed.value.toString(16),
+  const guiOptions = {
+    type: 'text', label: typed.name+":"+typed.type,
+    folder: folder,
+    initial: "0x"+typed.value.toString(16),
     onChange: (data) => {
       console.log(data);
       if (data.substring(0, 2) === '0x') {
@@ -43,57 +77,38 @@ dT.controls.bbn.showControl = function(typed, folder, {onChange, args}) {
       console.log(typed);
       if (onChange) onChange(typed);
    }
-  })
+  }
+  const component = guiRegister(typed, gui, guiOptions, options);
   console.log('component dT.controls["bbn"]', component);
+
   return typed
 }
 
-dT.controls.string.showControl = function(typed, folder, {onChange, args, arrOptions}) {
+dT.controls.string.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  const component = gui.Register({
-      type: 'text', label: typed.name+":"+typed.type,
-      folder: folder,
-      initial: typed.value,
+  const guiOptions = {
+    type: 'text', label: typed.name+":"+typed.type,
+    folder: folder,
+    initial: typed.value,
     onChange: (data) => {
       console.log(data);
       typed.value  = data
       console.log(typed);
       if (onChange) onChange(typed);
-   }
-  })
-  console.log('dT.controls["string"]', component);
-  console.log('-------- arrOptions', arrOptions);
-  if (arrOptions) {
-    if (arrOptions.add && arrOptions.index === 0) {
-      const addBtnBef = createBtn('+', () => {
-        console.log('add');
-        arrOptions.add(arrOptions.index);
-      });
-      component.container.children[0].appendChild(addBtnBef);
-    }
-    if (arrOptions.remove) {
-      const removeBtn = createBtn('-', () => {
-        console.log('remove');
-        component.Remove();
-        if (onChange) onChange(null);
-      });
-      component.container.children[0].appendChild(removeBtn);
-    }
-    if (arrOptions.add) {
-      const addBtn = createBtn('+', () => {
-        console.log('add');
-        arrOptions.add(arrOptions.index + 1);
-      });
-      component.container.children[0].appendChild(addBtn);
     }
   }
+
+  const component = guiRegister(typed, gui, guiOptions, options);
+  console.log('dT.controls["string"]', component);
 
   return typed
 }
 
-dT.controls.natural.showControl = function(typed, folder, {onChange, args}){
+dT.controls.natural.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  const component = gui.Register({
+  const guiOptions = {
     type: 'range', label: typed.name+":"+typed.type,
     min: dT.controls[typed.type].min(),
     max: dT.controls[typed.type].max(),
@@ -104,14 +119,17 @@ dT.controls.natural.showControl = function(typed, folder, {onChange, args}){
       typed.value  = data;
       if (onChange) onChange(typed);
    }
-  })
+  }
+  const component = guiRegister(typed, gui, guiOptions, options);
   console.log('dT.controls["natural"]', component);
+
   return typed
 }
 
-dT.enums.controls.showControl = function(typed, folder, {onChange, args}) {
+dT.enums.controls.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  const component = gui.Register({
+  const guiOptions = {
     type: 'select', label: typed.name+":"+typed.type,
     options: dT.enum_choices[typed.type.substring(5)],
     folder: folder,
@@ -122,45 +140,75 @@ dT.enums.controls.showControl = function(typed, folder, {onChange, args}) {
       console.log(typed);
       if (onChange) onChange(typed);
    }
-  })
+  }
+  const component = guiRegister(typed, gui, guiOptions, options);
   console.log('dT.enums.controls', component);
+
   return typed
 }
 
-dT.controls.tuple.showControl = function(typed, folder, {onChange, args}) {
+dT.controls.tuple.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  console.log('dT.controls.tuple.showControl', typed, folder);
-  console.log('dT.controls.tuple.showControl onChange', onChange);
-  console.log('dT.controls.tuple.showControl args', args);
   let fold1 = folder+"."+typed.name
-  const component = gui.Register(
-  {
+  const guiOptions = {
     type: 'folder',
     label: fold1,
     folder: folder,
     open: true
-  })
-  console.log('dT.controls.tuple', component);
+  }
+  const getContainer = comp => comp.container;
+  const component = guiRegister(typed, gui, guiOptions, options, getContainer);
+
   return fold1
 }
 
-dT.controls.array.showControl = function(typed, folder, {onChange, args}) {
+dT.controls.array.showControl = function(typed, folder, options = {}) {
+  const {onChange, args, arrOptions} = options;
   const [gui] = args;
   let fold1 = folder+"."+typed.name
-  const component = gui.Register(
-  {
+  const guiOptions = {
     type: 'folder',
     label: fold1,
     folder: folder,
     open: true
-  })
-  console.log('dT.controls.array', component);
+  }
+  const component = gui.Register(guiOptions);
+
+  // Add sub-element in array at index 0
+  if (arrOptions.addInner) {
+    const addElemBtn = createBtn('+', () => {
+      arrOptions.addInner(0);
+    });
+    component.container.insertBefore(addElemBtn, component.container.children[1]);
+  }
+
+  // If array is part of another array, remove array button
+  if (arrOptions.remove) {
+    const removeBtn = createBtn('-', () => {
+      component.Remove();
+      if (onChange) onChange(null);
+    });
+    component.container.appendChild(removeBtn);
+  }
+
+  // If array is part of another array, add another array after it
+  if (arrOptions.add) {
+    const addBtn = createBtn('+', () => {
+      const newArrayElem = Object.assign({}, typed);
+      newArrayElem.value = [newArrayElem.value[0]];
+      if (onChange) onChange(newArrayElem, arrOptions.index + 1);
+    });
+    component.container.appendChild(addBtn);
+  }
+
   return fold1
 }
 
-dT.controls.bool.showControl = function(typed, folder, {onChange, args}) {
+dT.controls.bool.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  const component = gui.Register({
+  const guiOptions = {
     type: 'checkbox', label: typed.name,
     folder: folder,
     initial: typed.value.gt(new dT.BN(0)),
@@ -170,18 +218,22 @@ dT.controls.bool.showControl = function(typed, folder, {onChange, args}) {
       console.log(typed);
       if (onChange) onChange(typed);
    }
-  })
-  console.log('dT.controls.bool', component);
+  }
+  const component = guiRegister(typed, gui, guiOptions, options);
+
   return typed
 }
 
-dT.controls.jsfunction.showControl = function(typed, folder, {onChange, args}) {
+dT.controls.jsfunction.showControl = function(typed, folder, options = {}) {
+  const {onChange, args} = options;
   const [gui] = args;
-  gui.Register({
+  const guiOptions = {
     type: 'button', label: typed.name,
     folder: folder,
     action: typed.value
- })
+  }
+  const component = guiRegister(typed, gui, guiOptions, options);
+
   return typed
 }
 
