@@ -1,5 +1,14 @@
 import dT from '@pipeos/dtype2';
 
+function createBtn(text, onclick) {
+  const btn = document.createElement('button');
+  btn.innerText = text;
+  btn.onclick = onclick;
+  btn.style.backgroundColor = "rgb(186, 181, 161)";
+  btn.style.padding = "2px";
+  return btn;
+}
+
 dT.controls.bn.showControl = function(typed, folder, {onChange, args}) {
   const [gui] = args;
   const component = gui.Register({
@@ -53,28 +62,31 @@ dT.controls.string.showControl = function(typed, folder, {onChange, args, arrOpt
    }
   })
   console.log('dT.controls["string"]', component);
-
-  // if (arrOptions) {
-  //   if (arrOptions.remove) {
-  //     const removeBtn = document.createElement('button');
-  //     removeBtn.innerText = '-';
-  //     removeBtn.onclick = () => {
-  //       console.log('remove');
-  //       component.Remove();
-  //       if (onChange) onChange(null);
-  //     }
-  //     component.container.children[0].appendChild(removeBtn);
-  //   }
-  //   if (arrOptions.add) {
-  //     const addBtn = document.createElement('button');
-  //     addBtn.innerText = '+';
-  //     addBtn.onclick = () => {
-  //       console.log('add');
-  //       arrOptions.add();
-  //     }
-  //     component.container.children[0].appendChild(addBtn);
-  //   }
-  // }
+  console.log('-------- arrOptions', arrOptions);
+  if (arrOptions) {
+    if (arrOptions.add && arrOptions.index === 0) {
+      const addBtnBef = createBtn('+', () => {
+        console.log('add');
+        arrOptions.add(arrOptions.index);
+      });
+      component.container.children[0].appendChild(addBtnBef);
+    }
+    if (arrOptions.remove) {
+      const removeBtn = createBtn('-', () => {
+        console.log('remove');
+        component.Remove();
+        if (onChange) onChange(null);
+      });
+      component.container.children[0].appendChild(removeBtn);
+    }
+    if (arrOptions.add) {
+      const addBtn = createBtn('+', () => {
+        console.log('add');
+        arrOptions.add(arrOptions.index + 1);
+      });
+      component.container.children[0].appendChild(addBtn);
+    }
+  }
 
   return typed
 }
@@ -174,3 +186,5 @@ dT.controls.jsfunction.showControl = function(typed, folder, {onChange, args}) {
 }
 
 dT.t.extendTypes();
+
+export default dT;

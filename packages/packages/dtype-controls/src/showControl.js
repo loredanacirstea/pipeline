@@ -1,6 +1,5 @@
 import guify from 'guify';
-import dT from '@pipeos/dtype2';
-import './types';
+import dT from './types.js';
 
 function showControl(vObj, divId, options = {}) {
   let div = document.getElementById(divId)
@@ -41,8 +40,15 @@ function showControl(vObj, divId, options = {}) {
     opacity: 0.90,
   }
 
+  let lastObj = Object.assign({}, vObj);
+
   const onChangeSubTyped = (typed) => {
+    lastObj = Object.assign({}, typed);
     options.onChange(typed);
+  }
+
+  const onReinitialize = () => {
+    showControl(lastObj, divId, options);
   }
 
   const guiOptions = Object.assign({}, DEFAULT_OPTS, options.gui || {});
@@ -54,6 +60,7 @@ function showControl(vObj, divId, options = {}) {
       vObj=dT.t.apply(vObj, "random");
       showControl(vObj, divId, options);
       if (options.onChange) {
+        lastObj = Object.assign({}, vObj);
         options.onChange(vObj);
       }
     }});
@@ -71,6 +78,7 @@ function showControl(vObj, divId, options = {}) {
 
   return dT.t.apply(vObj, "showControl", "", {
     onChange: onChangeSubTyped,
+    onReinitialize,
     args: [gui],
   });
 }

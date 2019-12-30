@@ -164,6 +164,17 @@ dT.typemap = [
 ]
 
 dT.t.extendTypes = function() {
+  S.map (((y) => {
+    if (y < 7) {
+      dT.t.bnType( "uint"+y*8, new dT.BN(0), new dT.BN(2).pow(new dT.BN(y*8)))
+      dT.t.bnType( "int"+y*8, new dT.BN(2).pow(new dT.BN(y*8-1)).neg(), new dT.BN(2).pow(new dT.BN(y*8-1)))
+    } else {
+      dT.t.bbnType( "uint"+y*8, new dT.BN(0), new dT.BN(2).pow(new dT.BN(y*8)))
+      dT.t.bbnType( "int"+y*8, new dT.BN(2).pow(new dT.BN(y*8-1)).neg(), new dT.BN(2).pow(new dT.BN(y*8-1)))
+    }
+    dT.t.byteType("bytes"+y, y)
+  })) (S.range (1) (33));
+
   dT.typemap.map(x=>{
     if (x[1] in dT.controls) {
       dT.t.setType(x[0], x=>true,[dT[x[1]]])
@@ -176,17 +187,6 @@ dT.t.extendTypes = function() {
       dT.t.setType(x[0], x=>true,[x[1]])
     }
   })
-
-  S.map (((y) => {
-    if (y < 7) {
-      dT.t.bnType( "uint"+y*8, new dT.BN(0), new dT.BN(2).pow(new dT.BN(y*8)))
-      dT.t.bnType( "int"+y*8, new dT.BN(2).pow(new dT.BN(y*8-1)).neg(), new dT.BN(2).pow(new dT.BN(y*8-1)))
-    } else {
-      dT.t.bbnType( "uint"+y*8, new dT.BN(0), new dT.BN(2).pow(new dT.BN(y*8)))
-      dT.t.bbnType( "int"+y*8, new dT.BN(2).pow(new dT.BN(y*8-1)).neg(), new dT.BN(2).pow(new dT.BN(y*8-1)))
-    }
-    dT.t.byteType("bytes"+y, y)
-  })) (S.range (1) (33));
 }
 
 dT.t.extendTypes();

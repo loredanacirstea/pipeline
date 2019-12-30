@@ -70,32 +70,30 @@ dT.t.apply = function(typed, fnName, folder, options) {
 
     value.forEach((val, i) => {
       const onChangeSub = (typedSub) => {
-        console.log('onChangeSub array', i, typedSub);
         if (options.onChange) {
           if (!typedSub) {
-            console.log('null', typed.value, typed.type, JSON.stringify(typed.value), JSON.stringify(typed.type));
             typed.value.splice(i, 1);
-            console.log('onChangeSub typed remove', typed);
             options.onChange(typed);
           } else {
             typed.value[i] = typedSub.value;
-            console.log('onChangeSub typed', typed);
             options.onChange(typed);
           }
         }
       }
       const optionscpy = Object.assign({}, options, {onChange: onChangeSub});
 
-      // const addArrayElem = (smth) => {
-      //   console.log('arrOptions add', smth);
-      //   const ind = i+1;
-      //   typed.value.splice(ind, 0, null);
-      //   dT.t.apply({value:value[ind], type:arrT, name: typed.name+ind+ind}, fnName, folder, optionscpy);
-      // }
-      // optionscpy.arrOptions = {
-      //   add: addArrayElem,
-      //   remove: (smth) => {console.log('arrOptions remove', smth);},
-      // }
+      const addArrayElem = (ind) => {
+        // const ind = i+1;
+        typed.value.splice(ind, 0, null);
+        options.onChange(typed);
+        options.onReinitialize();
+        // dT.t.apply({value:value[ind], type:arrT, name: typed.name+ind+ind}, fnName, folder, optionscpy);
+      }
+      optionscpy.arrOptions = {
+        add: addArrayElem,
+        remove: () => {},
+        index: i,
+      }
 
       ans[i] = dT.t.apply({value:value[i], type:arrT, name: typed.name+i}, fnName, folder, optionscpy)
 
