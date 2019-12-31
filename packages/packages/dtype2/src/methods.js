@@ -24,12 +24,14 @@ dT.t.apply = function(typed, fnName, folder, options) {
   let value = typed.value
   let temp = {}
   let ndx = 0
-  let fn,  ans=[],out={value:[],type:[]}
+  let fn, ans = [], out = {value: [], type: []};
+
   if (!(typeof type == "string")) {
     if (value instanceof Array)
       if (value.length !== Object.keys(type).length) {
         return false
       }
+    // Used only for showControl...
     if (dT.controls.tuple[fnName]) {
       console.log('apply tuple options', fnName, options);
       folder = dT.controls.tuple[fnName](typed, folder, options)
@@ -45,7 +47,7 @@ dT.t.apply = function(typed, fnName, folder, options) {
       }
       const optionscpy = Object.assign({}, options, {onChange: onChangeSub});
       temp = {}
-      temp.value = value[ndx]
+      temp.value = value instanceof Array ? value[ndx] : null
       temp.type = type[i]
       temp.name = i
       console.log('apply tuple item options', fnName, optionscpy);
@@ -61,6 +63,9 @@ dT.t.apply = function(typed, fnName, folder, options) {
   console.log(arrT)
   if (arrT) {
     ans = []
+
+    typed.value = typed.value || [null];
+    value = typed.value;
 
     const addInner = (ind, innerElem) => {
       innerElem = innerElem ? innerElem.value : JSON.parse(JSON.stringify(typed.value[0]));
@@ -117,7 +122,7 @@ dT.t.apply = function(typed, fnName, folder, options) {
         index: i,
       }
 
-      ans[i] = dT.t.apply({value:value[i], type:arrT, name: typed.name+i}, fnName, folder, optionscpy)
+      ans[i] = dT.t.apply({value: value[i], type: arrT, name: typed.name + i}, fnName, folder, optionscpy)
 
       out.value.push(ans[i].value)
     });

@@ -62,23 +62,24 @@ dT.enums.controls = {
 }
 
 dT.controls.tuple = {
-  random: function(value, type){
-    let ndx = 0, temp, ans =[], out={value:[],type:{}}
-    for (let i in type){
+  random: function(typed) {
+    let ndx = 0, temp, ans = [], out = {value: [], type: {}};
+
+    Object.keys(typed.type).forEach(i => {
       temp = {}
-      temp.value = value[ndx]
-      temp.type = type[i]
+      temp.value = typed.value instanceof Array ? typed.value[ndx] : null;
+      temp.type = typed.type[i]
       temp.name = i
       ans[i] = dT.t.apply(temp, "random")
-      out.value[ndx]=ans[i].value
-      out.type[i]=ans[i].type
+      out.value[ndx] = ans[i].value
+      out.type[i] = ans[i].type
       ndx++
-    }
+    })
     return out
   }
 }
 
-dT.t.setComposite("type_component", { label:"string", "Component":"enum:types", "[x1]":"uint8", "[x2]":"uint8"})
+dT.t.setComposite("type_component", { label:"string", Component:"enum:types", dimensions:"uint8[]"})
 
 
 dT.controls.array  = {
