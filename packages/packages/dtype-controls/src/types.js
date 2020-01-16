@@ -166,7 +166,7 @@ dT.controls.tuple.showControl = function(typed, folder, options = {}) {
 dT.controls.array.showControl = function(typed, folder, options = {}) {
   const {onChange, args, arrOptions} = options;
   const [gui] = args;
-  let fold1 = folder+"."+typed.name
+  let fold1 = folder+".$."+typed.name
   const guiOptions = {
     type: 'folder',
     label: fold1,
