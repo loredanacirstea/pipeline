@@ -211,7 +211,7 @@ dT.controls.bool.showControl = function(typed, folder, options = {}) {
   const guiOptions = {
     type: 'checkbox', label: typed.name,
     folder: folder,
-    initial: typed.value.gt(new dT.BN(0)),
+    initial: typed.value, // .gt(new dT.BN(0)),
     onChange: (data) => {
       console.log(data);
       typed.value  = data
@@ -237,6 +237,76 @@ dT.controls.jsfunction.showControl = function(typed, folder, options = {}) {
   return typed
 }
 
+//wasm
+
+// dT.controls.u32.showControl = function(typed, folder, options = {}) {
+//   const {onChange, args} = options;
+//   const [gui] = args;
+//   const guiOptions = {
+//     type: 'range', label: typed.name+":"+typed.type,
+//     min: dT.controls[typed.type].min().toString(10),
+//     max: dT.controls[typed.type].max().toString(10), step: 1 ,
+//     folder: folder,
+//     initial: typed.value.toString(10),
+//     onChange: (data) => {
+//       typed.value  = BigInt(data)
+//       if (onChange) onChange(typed);
+//    }
+//   }
+//
+//   const component = guiRegister(typed, gui, guiOptions, options);
+//   console.log('component dT.controls["bn"]', component);
+//
+//   return typed
+// }
+
+// dT.controls.i32.showControl = function(typed, folder, options = {}) {
+//   const {onChange, args} = options;
+//   const [gui] = args;
+//   const guiOptions = {
+//     type: 'text', label: typed.name+":"+typed.type,
+//     folder: folder,
+//     initial: typed.value,
+//     onChange: (data) => {
+//       console.log(data);
+//       typed.value  = BigInt(data)
+//       console.log(typed);
+//       if (onChange) onChange(typed);
+//     }
+//   }
+//
+//   const component = guiRegister(typed, gui, guiOptions, options);
+//   console.log('dT.controls["string"]', component);
+//
+//   return typed
+// }
+//
+// dT.controls.i64.showControl = dT.controls.i32.showControl
+// dT.controls.u64.showControl = dT.controls.u32.showControl
+//
+// dT.controls.f32.showControl =  function(typed, folder, options = {}) {
+//   const {onChange, args} = options;
+//   const [gui] = args;
+//   const guiOptions = {
+//     type: 'text', label: typed.name+":"+typed.type,
+//     folder: folder,
+//     initial: typed.value,
+//     onChange: (data) => {
+//       console.log(data);
+//       typed.value  = Float32Array([data]);
+//       console.log(typed);
+//       if (onChange) onChange(typed);
+//     }
+//   }
+//
+//   const component = guiRegister(typed, gui, guiOptions, options);
+//   console.log('dT.controls["string"]', component);
+//
+//   return typed
+// }
+//
+// dT.controls.f64.showControl = dT.controls.f32.showControl
+
 dT.t.extendTypes();
 
-export default dT;
+export {dT, guiRegister, createBtn};

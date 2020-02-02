@@ -1,2 +1,2 @@
 export {default as showControl} from './showControl';
-export {default as dT} from './types.js';
+export {dT, guiRegister, createBtn} from './types.js';

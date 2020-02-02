@@ -20,6 +20,27 @@ dT.controls["bn"] = {
   },
 }
 
+// dT.controls["i32"] = {
+//   min: function(min){if (min !== undefined) this._min = min; return this._min;},
+//   max: function(max){if (max !== undefined) this._max = max; return this._max;},
+//   random: function(typed){
+//     return ({value: 0n, type: "i32"});
+//   }
+//   // random: function(typed){
+//   //   let type = typed.type
+//   //   let range = dT.t.getRange(typed)
+//   //   let val = range.max.sub(new dT.BN(Math.random()*Number.MAX_SAFE_INTEGER).mul(range.max.sub(range.min)).div(new dT.BN(Number.MAX_SAFE_INTEGER)))
+//   //   return ({value:  val, type: type})
+//   // },
+// }
+//
+// dT.controls["u32"] = dT.controls["i32"]
+// dT.controls["i64"] = dT.controls["i32"]
+// dT.controls["u64"] = dT.controls["i64"]
+// dT.controls["f64"] = dT.controls["i64"]
+// dT.controls["f32"] = dT.controls["i32"]
+
+
 dT.controls["bbn"] = {}
 
 dT["string"] = _.NullaryType
@@ -163,6 +184,11 @@ dT.typemap = [
   ["any", _.Any],
   ["jsfunction", _.AnyFunction],
 ]
+
+// dT.t.biType("i32", -(BigInt(2) ** BigInt(32-1)-BigInt(1)), BigInt(2) ** BigInt(32-1)-BigInt(1))
+// dT.t.biType("u32", BigInt(0), BigInt(2) ** BigInt(32)-BigInt(1))
+// dT.t.biType("i64", -(BigInt(2) ** BigInt(64-1)-BigInt(1)), BigInt(2) ** BigInt(64-1)-BigInt(1))
+// dT.t.biType("u64", BigInt(0), BigInt(2) ** BigInt(64)-BigInt(1))
 
 dT.t.extendTypes = function() {
   S.map (((y) => {

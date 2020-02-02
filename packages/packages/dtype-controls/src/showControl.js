@@ -1,5 +1,5 @@
 import guify from 'guify';
-import dT from './types.js';
+import {dT} from './types.js';
 
 function showControl(vObj, divId, options = {}) {
   let div = document.getElementById(divId)

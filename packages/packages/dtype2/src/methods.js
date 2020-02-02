@@ -33,9 +33,11 @@ dT.t.apply = function(typed, fnName, folder, options) {
       }
     // Used only for showControl...
     if (dT.controls.tuple[fnName]) {
-      console.log('apply tuple options', fnName, options);
+      console.log('apply tuple options', fnName, folder, options);
       folder = dT.controls.tuple[fnName](typed, folder, options)
+      console.log('tuple folder', folder);
     }
+
     Object.keys(type).forEach((i, nndx) => {
       const onChangeSub = typedSub => {
         if (options.onChange) {
@@ -50,7 +52,7 @@ dT.t.apply = function(typed, fnName, folder, options) {
       temp.value = value instanceof Array ? value[ndx] : null
       temp.type = type[i]
       temp.name = i
-      console.log('apply tuple item options', fnName, optionscpy);
+      console.log('apply tuple item options', i, temp, fnName, optionscpy);
       ans[i] = dT.t.apply(temp, fnName, folder, optionscpy)
       out.value[ndx]=ans[i].value
       out.type[i]=ans[i].type
@@ -60,7 +62,7 @@ dT.t.apply = function(typed, fnName, folder, options) {
   }
 
   let arrT = dT.t.getArrayType({type:type})
-  console.log(arrT)
+  console.log('is arrT', arrT);
   if (arrT) {
     ans = []
 
@@ -126,7 +128,10 @@ dT.t.apply = function(typed, fnName, folder, options) {
 
       out.value.push(ans[i].value)
     });
+    console.log('aaaaaaans', ans);
     out.type = ans[0].type+"[]"
+    console.log('ooooout', out);
+
     return out;
   }
 
@@ -197,6 +202,11 @@ dT.t.setEnum = function (name, choices){
     ("types")
     (dT.settings.refURL+"types")
     (dT.enum_choices.types);
+  dT.controls[name] = {
+    min: () => new dT.BN(0),
+    max: () => new dT.BN(choices.length - 1),
+    random: dT.enums.controls.random,
+  }
   return dT.enums[name]
 }
 
@@ -221,6 +231,17 @@ dT.t.bbnType  = function (name, min, max){
   return dT.t.setType(name, test, supertypes)
 
 }
+
+// dT.t.biType  = function (name, min, max){
+//   let test = x => x >= min &&
+//       x <= max
+//   let supertypes = []
+//   dT.controls[name] = Object.assign({},dT.controls["i32"]) // ,dT.controls["bn"]
+//   dT.controls[name].min(min)
+//   dT.controls[name].max(max)
+//   return dT.t.setType(name, test, supertypes)
+//
+// }
 
 dT.t.byteType  = function (name, len){
   const re = `0x[a-fA-F0-9]{${len*2}}`
