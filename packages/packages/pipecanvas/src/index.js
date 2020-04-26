@@ -101,6 +101,7 @@ function pipecanvas(fcontext = {}, pipegraph = {}, options={}) {
   let current_edge = ({pos:[], target: false})
 
   let targets = JSON.parse(JSON.stringify(DEFAULT_TARGETS));
+  console.log('pipetypes', pipetypes)
   let pipe1 = new pipejs(pipetypes);
 
   setGraph(pipegraph, fcontext);

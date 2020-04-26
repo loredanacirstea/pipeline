@@ -41,7 +41,8 @@ var Sanct = require('sanctuary');
 
 var SDef = require('sanctuary-def');
 
-var bigInt = require("big-integer");
+var bigInt = require("big-integer"); // const { pipetypes } = require('./types/index.js')
+
 
 function pipe(rtypes) {
   window.S = Sanct;
@@ -194,6 +195,7 @@ function pipe(rtypes) {
     // will be deprecated
     "stateMutability": pl["abi_mutability"]
   });
+  console.log('******************************* arara');
   pl["event_abi"] = SDef.RecordType({
     "type": pl["abi_type"],
     "name": SDef.String,
@@ -646,6 +648,8 @@ Sanct$1.map(y => {
 
 [['string', SDef$1.String], ['bytes', SDef$1.String], ['function', SDef$1.Any], ['address', solidity['bytes20']], ['byte', solidity['bytes1']], ['uint', solidity['uint256']], ['int', solidity['int256']], ['bool', solidity['uint8']], ['tuple', SDef$1.Any] // has to be better defined SDef.RecordType
 ].map(x => solidity[x[0]] = x[1]);
+solidity['T'] = SDef$1.Any;
+solidity['array'] = SDef$1.Any;
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;

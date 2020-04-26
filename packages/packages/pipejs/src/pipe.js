@@ -3,6 +3,7 @@
 const Sanct = require ('sanctuary');
 const SDef = require ('sanctuary-def');
 const bigInt = require("big-integer");
+// const { pipetypes } = require('./types/index.js')
 
 function pipe(rtypes) {
   window.S = Sanct;
@@ -168,7 +169,7 @@ pl["func_abi"] = SDef.RecordType({
   "payable": SDef.Boolean, // will be deprecated
   "stateMutability": pl["abi_mutability"],
 })
-
+console.log('******************************* arara')
 pl["event_abi"] = SDef.RecordType({
   "type": pl["abi_type"],
   "name": SDef.String,

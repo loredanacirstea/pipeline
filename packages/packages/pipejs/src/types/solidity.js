@@ -48,5 +48,8 @@ Sanct.map (((y)=>{
   ['tuple', SDef.Any], // has to be better defined SDef.RecordType
 ].map(x => solidity[x[0]] = x[1])
 
+solidity['T'] = SDef.Any
+solidity['array'] = SDef.Any
+
 
 export default solidity;
